@@ -45,7 +45,24 @@
     border: 2px solid var(--darkGrey);
 }
 
+.startBtn:hover,
 .button:hover {
     background-color: var(--green);
 }
 
+.start {
+    text-align: center;
+}
+
+.startBtn {
+    display: inline;
+    color: white;
+    background-color: black;
+    cursor: pointer;
+    padding: 20px;
+    border: 2px solid var(--darkGrey);
+}
+
+.gameOver {
+    text-align: center;
+}

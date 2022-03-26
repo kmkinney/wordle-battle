@@ -15,48 +15,6 @@ export default function Home() {
         localStorage.clear()
     }, [])
 
-    const addPlayerOne = () => {
-        let players = [{}, {}]
-        let letters = {}
-        for (let i = 0; i < 26; i++) {
-            let c = String.fromCharCode(97 + i)
-            letters[c] = 'none'
-        }
-        players[0] = {
-            name: playerOneName,
-            secretWord: playerOneWord,
-            targetWord: '',
-            letters: letters,
-            numGuesses: 0,
-            pastGuesses: [],
-            currentGuess: '',
-            winner: false
-        }
-        localStorage.setItem('players', JSON.stringify(players))
-        localStorage.setItem('currPlayer', '1')
-    }
-
-    const addPlayerTwo = () => {
-        let players = [{}, {}]
-        let letters = {}
-        for (let i = 0; i < 26; i++) {
-            let c = String.fromCharCode(97 + i)
-            letters[c] = 'none'
-        }
-        players[1] = {
-            name: playerTwoName,
-            secretWord: playerTwoWord,
-            targetWord: '',
-            letters: letters,
-            numGuesses: 0,
-            pastGuesses: [],
-            currentGuess: '',
-            winner: false
-        }
-        localStorage.setItem('players', JSON.stringify(players))
-        localStorage.setItem('currPlayer', '2')
-    }
-
     return (
         <div className={styles.container}>
             <Head>
@@ -79,7 +37,7 @@ export default function Home() {
                             placeholder="Enter your secret word"
                             onChange={(e) => setPlayerOneWord(e.target.value)}
                         />
-                        <Link href={`/game/?p=1&n=${playerOneName}&w=${playerOneWord}`}>
+                        <Link href={`/players/1?n=${playerOneName}&w=${playerOneWord}`}>
                             <a
                                 className={styles.button}>Join as Player 1</a>
                         </Link>
@@ -96,7 +54,7 @@ export default function Home() {
                             placeholder="Enter your secret word"
                             onChange={(e) => setPlayerTwoWord(e.target.value)}
                         />
-                        <Link href={`/game/?p=2&n=${playerTwoName}&w=${playerTwoWord}`}>
+                        <Link href={`/players/2?n=${playerTwoName}&w=${playerTwoWord}`}>
                             <a
                                 className={styles.button}>Join as Player 2</a>
                         </Link>

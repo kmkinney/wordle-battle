@@ -9,15 +9,15 @@ const SocketHandler = function (req, res) {
         const io = new Server(res.socket.server)
         res.socket.server.io = io
 
-        // io.on('connection', socket => {
-        //     console.log("Setting up")
+        io.on('connection', socket => {
+            console.log("Setting up")
 
-        //     // Initialize Event Listeners
-        //     socket.on('game-start', msg => {
-        //         console.log('input change')
-        //         socket.broadcast.emit('update-input', msg)
-        //     })
-        // })
+            // Initialize Event Listeners
+            socket.on('start-game', msg => {
+                console.log('input change')
+                socket.broadcast.emit('game-started', msg)
+            })
+        })
     }
     res.end()
 }

@@ -21,6 +21,7 @@ export default function Game() {
   const [gameState, setGameState] = useState(startState);
   const [currPlayer, setCurrPlayer] = useState(null);
   const [otherPlayer, setOtherPlayer] = useState(null);
+
   const [secretWord, updateSecretWord] = useState(router.query.w);
   const [focus, updateFocus] = useState(1);
   const [submitted1, wasSubmitted1] = useState(false);
@@ -76,6 +77,10 @@ export default function Game() {
         });
       }
     });
+
+    socket.on('global-start-game', (msg) => {
+        console.log("GAME HAS STARTED " + msg)
+    })
     // initPlayer()
   };
 
@@ -126,12 +131,17 @@ export default function Game() {
     });
   };
 
+  const startGame = () => {
+      console.log("button clicked")
+      socket.emit("game-start", "the game has started")
+  }
+
   return (
     <div>
       <p>{JSON.stringify(gameState)}</p>
       <p>{JSON.stringify(currPlayer)}</p>
       <p>{JSON.stringify(otherPlayer)}</p>
-      <button onClick={() => updateGameState({ started: true })}>Start</button>
+      <button onClick={() => startGame()}>Start</button>
 
       <h2>Player Info</h2>
       <div className={styles.container}>

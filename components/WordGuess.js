@@ -3,99 +3,112 @@ import styles from '../styles/WordGuess.module.css';
 import { useEffect, useState, useRef } from 'react';
 
 export default function WordGuess(props) {
-  const [word, updateWord] = useState('');
-  const [colors, updateColors] = useState([]);
+    const [word, updateWord] = useState('');
+    const [colors, updateColors] = useState([]);
+    const [guessed, wasGuessed] = useState(false)
 
-  useEffect(() => {
-    updateColors(getColors(props.targetWord, word));
-  }, [props.submitted]);
+    useEffect(() => {
+        updateColors(getColors(props.targetWord, word));
+    }, [props.submitted]);
 
-  function Letters(props) {
+    useEffect(() => {
+        if(!guessed && colors.length === 5 && colors.every((c) => c === 'green')){
+            console.log('WORD GUESSED by ' + props.player)
+            fetch('/api/end', {
+                method: 'POST',
+                body: JSON.stringify({
+                    winner: props.player
+                })
+            })
+        }
+    }, [colors])
+
+    function Letters(props) {
+        return (
+            <>
+                {props.targetWord.split('').map((char, index) => {
+                    return (
+                        <Letter
+                            key={index}
+                            letter={word[index] == null ? '' : word[index]}
+                            color={colors[index]}
+                            submitted={props.submitted}
+                            targetWord={props.targetWord}
+                            focus={props.focus}
+                            index={props.index}
+                        />
+                    );
+                })}
+            </>
+        );
+    }
+
     return (
-      <>
-        {props.targetWord.split('').map((char, index) => {
-          return (
-            <Letter
-              key={index}
-              letter={word[index] == null ? '' : word[index]}
-              color={colors[index]}
-              submitted={props.submitted}
-              targetWord={props.targetWord}
-              focus={props.focus}
-              index={props.index}
+        <div className={styles.container}>
+            <Form
+                word={word}
+                updateWord={updateWord}
+                wasSubmitted={props.wasSubmitted}
+                targetWord={props.targetWord}
+                focus={props.focus}
+                updateFocus={props.updateFocus}
+                index={props.index}
             />
-          );
-        })}
-      </>
+            <Letters
+                submitted={props.submitted}
+                targetWord={props.targetWord}
+                focus={props.focus}
+                index={props.index}
+            />
+        </div>
     );
-  }
-
-  return (
-    <div className={styles.container}>
-      <Form
-        word={word}
-        updateWord={updateWord}
-        wasSubmitted={props.wasSubmitted}
-        targetWord={props.targetWord}
-        focus={props.focus}
-        updateFocus={props.updateFocus}
-        index={props.index}
-      />
-      <Letters
-        submitted={props.submitted}
-        targetWord={props.targetWord}
-        focus={props.focus}
-        index={props.index}
-      />
-    </div>
-  );
 }
 
 function Form(props) {
-  const inputRef = useRef();
+    const inputRef = useRef();
 
-  useEffect(() => {
-    if (props.index == props.focus) {
-      inputRef.current.focus();
-    }
-  }, [props.focus]);
+    useEffect(() => {
+        if (props.index == props.focus) {
+            inputRef.current.focus();
+        }
+    }, [props.focus]);
 
-  const changeWord = (event) => {
-    if (props.index == props.focus) {
-      props.updateWord(event.target.value);
-    }
-    event.preventDefault(); // don't redirect the page
-  };
+    const changeWord = (event) => {
+        if (props.index == props.focus) {
+            props.updateWord(event.target.value);
+        }
+        event.preventDefault(); // don't redirect the page
+    };
 
-  const submitWord = (event) => {
-    event.preventDefault(); // don't redirect the page
-    if (
-      event.target[0].value.length == props.targetWord.length &&
-      props.index == props.focus
-    ) {
-      props.wasSubmitted(true);
-      props.updateFocus(props.focus + 1);
-    }
-  };
+    const submitWord = (event) => {
+        event.preventDefault(); // don't redirect the page
+        if (
+            event.target[0].value.length == props.targetWord.length &&
+            props.index == props.focus
+        ) {
+            props.wasSubmitted(true);
+            props.updateFocus(props.focus + 1);
+        }
+    };
 
-  let isFocused = props.index == 1;
+    let isFocused = props.index == 1;
 
-  return (
-    <form className={styles.input} onSubmit={submitWord}>
-      <input
-        className={styles.hidden}
-        type='text'
-        required
-        spellCheck='false'
-        onKeyUp={changeWord}
-        // onBlur={({ target }) => target.focus()}
-        autoFocus={isFocused}
-        ref={inputRef}
-        maxLength={5}
-      />
-      <input className={styles.hidden} type='submit' value='Submit'></input>
-    </form>
-  );
+    return (
+        <form className={styles.input} onSubmit={submitWord}>
+            <input
+                className={styles.hidden}
+                type='text'
+                required
+                spellCheck='false'
+                onKeyUp={changeWord}
+                // onBlur={({ target }) => target.focus()}
+                autoFocus={isFocused}
+                ref={inputRef}
+                maxLength={5}
+            />
+            <input className={styles.hidden} type='submit' value='Submit'></input>
+        </form>
+    );
 }
 
 /**
@@ -106,28 +119,32 @@ function Form(props) {
  * @returns
  */
 function getColors(target, guess) {
-  let colors = [];
-  let tlc = new Map();
-  for (let i = 0; i < target.length; i++) {
-    let tl = target[i];
-    if (tlc.has(tl)) {
-      tlc.set(tl, tlc.get(tl) + 1);
-    } else {
-      tlc.set(tl, 1);
+    console.log("checking " + target + " " + guess)
+    let colors = ['grey', 'grey', 'grey', 'grey', 'grey'];
+    let tlc = new Map();
+    for (let i = 0; i < target.length; i++) {
+        let tl = target[i];
+        if (tlc.has(tl)) {
+            tlc.set(tl, tlc.get(tl) + 1);
+        } else {
+            tlc.set(tl, 1);
+        }
     }
-  }
-  for (let i = 0; i < target.length; i++) {
-    let tl = target[i];
-    let gl = guess[i];
-    if (tl === gl) {
-      colors.push('green');
-      tlc.set(gl, tlc.get(gl) - 1);
-    } else if (tlc.has(gl) && tlc.get(gl) > 0) {
-      colors.push('yellow');
-      tlc.set(gl, tlc.get(gl) - 1);
-    } else {
-      colors.push('grey');
+    for (let i = 0; i < target.length; i++) {
+        let tl = target[i];
+        let gl = guess[i];
+        if (tl === gl) {
+            colors[i] = 'green'
+            tlc.set(gl, tlc.get(gl) - 1);
+        }
     }
-  }
-  return colors;
+    for (let i = 0; i < target.length; i++) {
+        let tl = target[i];
+        let gl = guess[i];
+        if (colors[i] !== 'green' && tlc.has(gl) && tlc.get(gl) > 0) {
+            colors[i] = 'yellow';
+            tlc.set(gl, tlc.get(gl) - 1);
+        }
+    }
+    return colors;
 }

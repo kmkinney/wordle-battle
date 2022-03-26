@@ -14,17 +14,21 @@ export default function WordGuess(props) {
 
   useEffect(() => {
     updateColors(getColors(props.targetWord, word));
-    console.log(colors)
+    console.log(colors);
   }, [word]);
 
   return (
     <div className={styles.container}>
       <Form word={word} updateWord={updateWord} />
-      <Letter letter={word[0] == null ? '' : word[0]} color={colors[0]} />
-      <Letter letter={word[1] == null ? '' : word[1]} color={colors[1]} />
-      <Letter letter={word[2] == null ? '' : word[2]} color={colors[2]} />
-      <Letter letter={word[3] == null ? '' : word[3]} color={colors[3]} />
-      <Letter letter={word[4] == null ? '' : word[4]} color={colors[4]} />
+      {props.targetWord.split('').map((char, index) => {
+        return (
+          <Letter
+            key={index}
+            letter={word[index] == null ? '' : word[index]}
+            color={colors[index]}
+          />
+        );
+      })}
     </div>
   );
 }

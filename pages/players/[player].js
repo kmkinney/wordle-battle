@@ -206,7 +206,7 @@ export default function PlayerOne() {
                 </Link>
                 <div className={styles.results}>
                     <h2>Your word: {secretWord}</h2>
-                    <h2>{otherPlayer.name}'s word: {opponentWord}</h2>
+                    <h2>{otherPlayer.name}s word: {opponentWord}</h2>
                 </div>
             </div>
         )

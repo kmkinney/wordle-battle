@@ -1,3 +1,4 @@
+import { Router } from "next/router"
 import { useEffect } from "react"
 import { useState } from "react"
 import { io } from 'socket.io-client'
@@ -45,6 +46,7 @@ export default function Game() {
     } 
 
     const updateGameState = (newState) => {
+        socket.emit('game-update', newState)
         setGameState(gameState => {
             return {
                 ...gameState,

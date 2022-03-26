@@ -1,145 +1,237 @@
-import { Router, useRouter } from "next/router"
-import { useEffect } from "react"
-import { useState } from "react"
-import { io } from 'socket.io-client'
-import styles from '../styles/Home.module.css'
-import WordGuess from '../components/WordGuess'
-let socket
+import { Router, useRouter } from 'next/router';
+import Head from 'next/head'
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { io } from 'socket.io-client';
+import styles from '../styles/Home.module.css';
+import WordGuess from '../components/WordGuess';
+let socket;
 
 const startState = {
-    started: false,
-    live: false,
-    done: false,
-    winner: -1 /*index of player in Array*/,
-    players: []
-}
-
-const targetWord = "tests"
+  started: false,
+  live: false,
+  done: false,
+  winner: -1 /*index of player in Array*/,
+  players: [],
+};
 
 export default function Game() {
-    const router = useRouter()
+  const router = useRouter();
 
-    const [gameState, setGameState] = useState(startState)
-    const [currPlayer, setCurrPlayer] = useState(null)
-    const [otherPlayer, setOtherPlayer] = useState(null)
+  const [gameState, setGameState] = useState(startState);
+  const [currPlayer, setCurrPlayer] = useState(null);
+  const [otherPlayer, setOtherPlayer] = useState(null);
+  const [secretWord, updateSecretWord] = useState(router.query.w);
+  const [focus, updateFocus] = useState(1);
+  const [submitted1, wasSubmitted1] = useState(false);
+  const [submitted2, wasSubmitted2] = useState(false);
+  const [submitted3, wasSubmitted3] = useState(false);
+  const [submitted4, wasSubmitted4] = useState(false);
+  const [submitted5, wasSubmitted5] = useState(false);
+  const [submitted6, wasSubmitted6] = useState(false);
 
-    useEffect(() => {
-        initSocket().then(() => {
-            initPlayer()
-        })
-        return closeConnection()
-    }, [])
+  useEffect(() => {
+    initSocket().then(() => {
+      initPlayer();
+    });
+    return closeConnection();
+  }, []);
 
-    useEffect(() => {
-        console.log(currPlayer)
-    }, [currPlayer])
+  useEffect(() => {
+    console.log(currPlayer);
+  }, [currPlayer]);
 
-    const initSocket = async () => {
-        await fetch('/api/socket')
-        socket = io()
-        socket.on('connect', () => {
-            console.log('connected')
-        })
+  const initSocket = async () => {
+    await fetch('/api/socket');
+    socket = io();
+    socket.on('connect', () => {
+      console.log('connected');
+    });
 
-        socket.on('update-game-state', newState => {
-            console.log("Game State Updated")
-            console.log(newState)
-            // processUpdate(newState)
-            // if(gameState != newState)
-            setGameState(newState)
-        })
+    socket.on('update-game-state', (newState) => {
+      console.log('Game State Updated');
+      console.log(newState);
+      // processUpdate(newState)
+      // if(gameState != newState)
+      setGameState(newState);
+    });
 
-        socket.on('player-update', player => {
-            // console.log("")
-            if(player.number !== currPlayer.number)
-                setOtherPlayer(player)
-        })
+    socket.on('player-update', (player) => {
+      // console.log("")
+      if (player.number !== currPlayer.number) setOtherPlayer(player);
+    });
 
-        socket.on('game-end', newState => {
-            console.log("Game has ended")
-        })
+    socket.on('game-end', (newState) => {
+      console.log('Game has ended');
+    });
 
-        socket.on('player-join', newPlayer => {
-            console.log("NEW PLAYER: " + JSON.stringify(newPlayer))
-            console.log("CURR PLAYER: " + JSON.stringify(currPlayer))
-            if(currPlayer !== null && newPlayer.number !== currPlayer.number){
-                setOtherPlayer(newPlayer)
-                fetch('/api/join', {
-                    method: 'POST',
-                    body: JSON.stringify(currPlayer)
-                })
-            }
-        })
-        // initPlayer()
-    }
-
-    const initPlayer = () => {
-        console.log("QUERY " + JSON.stringify(router.query))
-
-        const playerNum = router.query.p
-        const playerName = router.query.n
-        const secretWord = router.query.w
-        console.log("init player")
-        // router.replace('/game', undefined, {shallow:true})
-        let letters = {}
-        for (let i = 0; i < 26; i++) {
-            let c = String.fromCharCode(97 + i)
-            letters[c] = 'none'
-        }
-        let currPlayer = {
-            number: playerNum,
-            name: playerName,
-            secretWord: secretWord,
-            targetWord: '',
-            letters: letters,
-            numGuesses: 0,
-            pastGuesses: [],
-            currentGuess: '',
-            winner: false
-        }
-        setCurrPlayer(currPlayer)
+    socket.on('player-join', (newPlayer) => {
+      console.log('NEW PLAYER: ' + JSON.stringify(newPlayer));
+      console.log('CURR PLAYER: ' + JSON.stringify(currPlayer));
+      if (currPlayer !== null && newPlayer.number !== currPlayer.number) {
+        setOtherPlayer(newPlayer);
         fetch('/api/join', {
-            method: 'POST',
-            body: JSON.stringify(currPlayer)
-        })
+          method: 'POST',
+          body: JSON.stringify(currPlayer),
+        });
+      }
+    });
+    // initPlayer()
+  };
+
+  const initPlayer = () => {
+    console.log('QUERY ' + JSON.stringify(router.query));
+
+    const playerNum = router.query.p;
+    const playerName = router.query.n;
+    // const secretWord = router.query.w;
+    updateSecretWord(router.query.w);
+    console.log('init player');
+    // router.replace('/game', undefined, {shallow:true})
+    let letters = {};
+    for (let i = 0; i < 26; i++) {
+      let c = String.fromCharCode(97 + i);
+      letters[c] = 'none';
     }
+    let currPlayer = {
+      number: playerNum,
+      name: playerName,
+      secretWord: secretWord,
+      targetWord: '',
+      letters: letters,
+      numGuesses: 0,
+      pastGuesses: [],
+      currentGuess: '',
+      winner: false,
+    };
+    setCurrPlayer(currPlayer);
+    fetch('/api/join', {
+      method: 'POST',
+      body: JSON.stringify(currPlayer),
+    });
+  };
 
-    const closeConnection = () => {
-        // console.log(socket)
-        socket?.close()
-    }
+  const closeConnection = () => {
+    // console.log(socket)
+    socket?.close();
+  };
 
-    const updateGameState = (newState) => {
-        fetch('/api/update', {
-            method: 'POST',
-            body: JSON.stringify({
-                ...gameState,
-                ...newState
-            })
-        })
-    }
+  const updateGameState = (newState) => {
+    fetch('/api/update', {
+      method: 'POST',
+      body: JSON.stringify({
+        ...gameState,
+        ...newState,
+      }),
+    });
+  };
 
-    return (
-        <div>
-            <p>{JSON.stringify(gameState)}</p>
-            <p>{JSON.stringify(currPlayer)}</p>
-            <p>{JSON.stringify(otherPlayer)}</p>
-            <button
-                onClick={() => updateGameState({ started: true })}
-            >
-                Start
-            </button>
+  return (
+    <div>
+      <p>{JSON.stringify(gameState)}</p>
+      <p>{JSON.stringify(currPlayer)}</p>
+      <p>{JSON.stringify(otherPlayer)}</p>
+      <button onClick={() => updateGameState({ started: true })}>Start</button>
 
-            <h2>Player Info</h2>
-            {/* <h3>Player Num: {playerNum} </h3> */}
-            {/* <h3>{gameState.players} </h3> */}
-            {/* <h3>Player Name: {gameState.players[playerNum-1]}</h3> */}
+      <h2>Player Info</h2>
+      <div className={styles.container}>
+        <Head>
+          <title>Wordle Off</title>
+          <meta name='description' content='Generated by create next app' />
+          <link rel='icon' href='/favicon.ico' />
+        </Head>
+        {/* <p>{JSON.stringify(gameState)}</p> */}
+        {/* <p>Started: {'' + gameState.started}</p> */}
+        {/* <p>Live: {'' + gameState.live}</p> */}
+        {/* <p>Done: {'' + gameState.done}</p> */}
+        {/* <p>PlayerCount: {gameState.players.length}</p> */}
+        {/* <button onClick={() => updateGameState({ started: true })}>Start</button> */}
+        {/* <button */}
+        {/*   onClick={(e) => { */}
+        {/*     e.preventDefault(); */}
+        {/*     console.log(socket); */}
+        {/*     updateGameState(startState); */}
+        {/*   }} */}
+        {/* > */}
+        {/*   Reset */}
+        {/* </button> */}
+        {/* <h2>Player Info</h2> */}
+        {/* <input */}
+        {/*   placeholder='Enter your name' */}
+        {/*   value={playerName} */}
+        {/*   onChange={(e) => setPlayerName(e.target.value)} */}
+        {/* /> */}
+        {/* <input */}
+        {/*   placeholder='Enter your Secret Word' */}
+        {/*   value={secretWord} */}
+        {/*   onChange={(e) => setSecretWord(e.target.value)} */}
+        {/* /> */}
+        {/* <button */}
+        {/*   onClick={() => { */}
+        {/*     addPlayer(); */}
+        {/*   }} */}
+        {/* > */}
+        {/*   Add Player */}
+        {/* </button> */}
+        <main className={styles.main}>
+          <WordGuess
+            targetWord={secretWord}
+            index={1}
+            focus={focus}
+            updateFocus={updateFocus}
+            submitted={submitted1}
+            wasSubmitted={wasSubmitted1}
+          />
+          <WordGuess
+            targetWord={secretWord}
+            index={2}
+            focus={focus}
+            updateFocus={updateFocus}
+            submitted={submitted2}
+            wasSubmitted={wasSubmitted2}
+          />
+          <WordGuess
+            targetWord={secretWord}
+            index={3}
+            focus={focus}
+            updateFocus={updateFocus}
+            submitted={submitted3}
+            wasSubmitted={wasSubmitted3}
+          />
+          <WordGuess
+            targetWord={secretWord}
+            index={4}
+            focus={focus}
+            updateFocus={updateFocus}
+            submitted={submitted4}
+            wasSubmitted={wasSubmitted4}
+          />
+          <WordGuess
+            targetWord={secretWord}
+            index={5}
+            focus={focus}
+            updateFocus={updateFocus}
+            submitted={submitted5}
+            wasSubmitted={wasSubmitted5}
+          />
+          <WordGuess
+            targetWord={secretWord}
+            index={6}
+            focus={focus}
+            updateFocus={updateFocus}
+            submitted={submitted6}
+            wasSubmitted={wasSubmitted6}
+          />
+        </main>
+        );
+      </div>
+      {/* <h3>Player Num: {playerNum} </h3> */}
+      {/* <h3>{gameState.players} </h3> */}
+      {/* <h3>Player Name: {gameState.players[playerNum-1]}</h3> */}
 
-            {/* <main className={styles.main}>
+      {/* <main className={styles.main}>
                 <WordGuess targetWord={targetWord} />
             </main> */}
-
-        </div>
-    )
+    </div>
+  );
 }
-

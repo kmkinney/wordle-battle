@@ -4,31 +4,41 @@ import { useEffect, useState, useRef } from 'react';
 
 export default function WordGuess(props) {
   const [word, updateWord] = useState('');
-  const [colors, updateColors] = useState([
-    'darkGrey',
-    'darkGrey',
-    'darkGrey',
-    'darkGrey',
-    'darkGrey',
-  ]);
+  const [colors, updateColors] = useState([]);
+  const [submitted, wasSubmitted] = useState(false);
 
   useEffect(() => {
     updateColors(getColors(props.targetWord, word));
-    console.log(colors);
-  }, [word]);
+  }, [word, submitted]);
+
+  function Letters(props) {
+    return (
+      <>
+        {props.targetWord.split('').map((char, index) => {
+          return (
+            <Letter
+              key={index}
+              letter={word[index] == null ? '' : word[index]}
+              color={colors[index]}
+              flipLetter={props.submitted}
+              submitted={submitted}
+              targetWord={props.targetWord}
+            />
+          );
+        })}
+      </>
+    );
+  }
 
   return (
     <div className={styles.container}>
-      <Form word={word} updateWord={updateWord} />
-      {props.targetWord.split('').map((char, index) => {
-        return (
-          <Letter
-            key={index}
-            letter={word[index] == null ? '' : word[index]}
-            color={colors[index]}
-          />
-        );
-      })}
+      <Form
+        word={word}
+        updateWord={updateWord}
+        wasSubmitted={wasSubmitted}
+        targetWord={props.targetWord}
+      />
+      <Letters submitted={submitted} targetWord={props.targetWord} />
     </div>
   );
 }
@@ -41,15 +51,21 @@ function Form(props) {
   }, []);
 
   const changeWord = (event) => {
-    event.preventDefault(); // don't redirect the page
-    console.log(event);
     props.updateWord(event.target.value);
+    event.preventDefault(); // don't redirect the page
+  };
+
+  const submitWord = (event) => {
+    event.preventDefault(); // don't redirect the page
+    if (event.target[0].value.length == props.targetWord.length) {
+      props.wasSubmitted(true);
+    }
   };
 
   return (
-    <form className={styles.input}>
+    <form className={styles.input} onSubmit={submitWord}>
       <input
-        className={styles.word}
+        className={styles.hidden}
         type='text'
         required
         spellCheck='false'
@@ -59,6 +75,7 @@ function Form(props) {
         ref={inputRef}
         maxLength={5}
       />
+      <input className={styles.hidden} type='submit' value='Submit'></input>
     </form>
   );
 }

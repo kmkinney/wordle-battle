@@ -4,7 +4,11 @@ import WordGuess from '../components/WordGuess'
 import { useState } from 'react' 
 
 export default function Home() {
+<<<<<<< Updated upstream
   const [targetWord, updateTargetWord] = useState("tears")
+=======
+  const [targetWord, updateTargetWord] = useState('tears');
+>>>>>>> Stashed changes
 
   return (
     <div className={styles.container}>
@@ -14,9 +18,24 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+<<<<<<< Updated upstream
       <main className={styles.main}>
         <WordGuess targetWord={targetWord}/>
       </main>
+=======
+      <div className={styles.main}>
+        <WordGuess targetWord={targetWord}/>
+          {/* <h1 className={styles.title}>Wordle Battle</h1> */}
+          {/* <div className={styles.buttonArea}> */}
+          {/*   <Link href='/game'> */}
+          {/*       <a className={styles.button}>Join as Player 1</a> */}
+          {/*   </Link> */}
+          {/*   <Link href='/game'> */}
+          {/*       <a className={styles.button}>Join as Player 2</a> */}
+          {/*   </Link> */}
+          {/* </div> */}
+      </div>
+>>>>>>> Stashed changes
     </div>
   )
 }

@@ -4,7 +4,7 @@ import WordGuess from '../components/WordGuess'
 import { useState } from 'react' 
 
 export default function Home() {
-  const [unknownWord, updateUnknownWord] = useState("tears")
+  const [targetWord, updateTargetWord] = useState("tears")
 
   return (
     <div className={styles.container}>
@@ -15,7 +15,7 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <WordGuess unknownWord={unknownWord}/>
+        <WordGuess targetWord={targetWord}/>
       </main>
     </div>
   )

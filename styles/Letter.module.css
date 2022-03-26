@@ -15,9 +15,9 @@
   transform-style: preserve-3d;
 }
 
-/* .flipCard:hover .flipCardInner {  use this when flipping images, just not with hover */ 
-/*   transform: rotateX(180deg); */
-/* } */
+.flipCard:hover .flipCardInner { 
+  transform: rotateX(180deg);
+}
 
 .flipCardFront, .flipCardBack {
   display: flex;
@@ -39,7 +39,6 @@
 }
 
 .flipCardBack {
-  background-color: transparent;
   transform: rotateY(180deg);
 }
 
@@ -52,5 +51,5 @@
 }
 
 .darkGrey {
-  background-color: var(--grey);
+  background-color: var(--darkGrey);
 }

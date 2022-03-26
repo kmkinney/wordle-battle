@@ -48,7 +48,6 @@ export default function PlayerOne() {
     }, [sendUpdate])
 
     const initSocket = async () => {
-        await fetch('/api/socket');
         let player = 0;
         if(router.query.player){
             player = parseInt(router.query.player)
@@ -58,7 +57,7 @@ export default function PlayerOne() {
             player = localStorage.getItem("player")
         }
 
-
+        await fetch(`/api/socket`)
         socket = io();
         socket.on('connect', () => {
             console.log(`Player ${player} connected`);

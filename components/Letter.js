@@ -12,7 +12,7 @@ export default function Letter(props) {
 
   useEffect(() => {
     updateColor(getColor(props.color))
-  }, [props.letter])
+  }, [props.color])
 
   return (
     <div className={styles.flipCard}>

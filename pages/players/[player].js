@@ -25,6 +25,7 @@ export default function PlayerOne() {
     const [otherGuesses, updateOtherGuesses] = useState([])
     const [secretWord, updateSecretWord] = useState('-----');
     const [opponentWord, updateOpponentWord] = useState('-----');
+    const [outOfGuesses, updateOutOfGuesses] = useState(false)
 
     useEffect(() => {
         console.log("RESTART")
@@ -35,8 +36,8 @@ export default function PlayerOne() {
     }, []);
 
     useEffect(() => {
-        console.log("opponent word UPDATE" + JSON.stringify(otherGuesses));
-    }, [otherGuesses]);
+        console.log("GUESSES OUT? " + outOfGuesses);
+    }, [outOfGuesses]);
 
     useEffect(() => {
         console.log(currPlayer)
@@ -51,7 +52,7 @@ export default function PlayerOne() {
 
     const initSocket = async () => {
         let player = 0;
-        if(router.query.player){
+        if (router.query.player) {
             player = parseInt(router.query.player)
             localStorage.setItem("player", player)
         }
@@ -73,15 +74,15 @@ export default function PlayerOne() {
             setGameState(newState);
         });
 
-        socket.on(`player-${3-player}-update`, (other) => {
+        socket.on(`player-${3 - player}-update`, (other) => {
             console.log("PLAYER UPDATE " + other)
             setOtherPlayer(other);
             updateOpponentWord(other.secretWord)
         });
 
-        socket.on(`player-${3-player}-guess`, (guess) => {
+        socket.on(`player-${3 - player}-guess`, (guess) => {
             console.log("PLAYER GUESS UPDATE " + JSON.stringify(guess))
-            updateOtherGuesses((otherGuesses) => [...otherGuesses,guess])
+            updateOtherGuesses((otherGuesses) => [...otherGuesses, guess])
         });
 
         socket.on('game-ended', (gameWinner) => {
@@ -169,21 +170,28 @@ export default function PlayerOne() {
     if (!gameState.done) {
         return (
             <div>
-                {/* <p>{JSON.stringify(gameState)}</p>
-                <p>{JSON.stringify(currPlayer)}</p>
-                <p>{JSON.stringify(otherPlayer)}</p> */}
-                <OpponentView word={secretWord} 
+                {outOfGuesses ? 
+                <div className={styles.gameOver}>
+                    <h1>Out of Guesses</h1>
+                </div>
+                :
+                <div></div>
+                }
+                <OpponentView word={secretWord}
                     name={otherPlayer ? otherPlayer.name : "Player 2"}
                     guesses={otherGuesses}
                 ></OpponentView>
                 <Game secretWord={opponentWord}
                     startGameFn={startGame}
                     started={gameState.started}
-                    player={currPlayer ? currPlayer.number : 0}>
+                    player={currPlayer ? currPlayer.number : 0}
+                    name={currPlayer ? currPlayer.name : ''}
+                    updateOutOfGuesses={updateOutOfGuesses}>
                 </Game>
             </div>
         );
     }
+
     else {
         return (
             <div className={styles.gameOver}>

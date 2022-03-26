@@ -8,7 +8,7 @@ export default function WordGuess(props) {
     const [guessed, wasGuessed] = useState(false)
 
     useEffect(() => {
-        updateColors(getColors(props.targetWord, word));
+        updateColors(getColors(props.targetWord.toLowerCase(), word.toLowerCase()));
     }, [props.submitted]);
 
     useEffect(() => {

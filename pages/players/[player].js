@@ -6,6 +6,7 @@ import { io } from 'socket.io-client';
 import styles from '../../styles/Home.module.css';
 import Game from '../../components/Game'
 import OpponentView from '../../components/OpponentView';
+import BackButton from '../../components/BackButton';
 let socket;
 
 const startState = {
@@ -177,6 +178,7 @@ export default function PlayerOne() {
                 :
                 <div></div>
                 }
+                <BackButton/>
                 <OpponentView word={secretWord}
                     name={otherPlayer ? otherPlayer.name : "Player 2"}
                     guesses={otherGuesses}
@@ -195,6 +197,7 @@ export default function PlayerOne() {
     else {
         return (
             <div className={styles.gameOver}>
+                <BackButton/>
                 <h1 className={styles.title}>Game Over</h1>
                 <h2>Player {gameState.winner} won!</h2>
                 <Link href='/'>

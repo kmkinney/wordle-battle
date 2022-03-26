@@ -77,3 +77,11 @@
     width: 10rem;
     height: 2rem;
 }
+
+.backButton {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 20px;
+    text-align: center;
+}

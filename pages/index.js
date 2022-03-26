@@ -96,9 +96,8 @@ export default function Home() {
                             placeholder="Enter your secret word"
                             onChange={(e) => setPlayerTwoWord(e.target.value)}
                         />
-                        <Link href='/game'>
+                        <Link href={`/game/?p=2&n=${playerTwoName}&w=${playerTwoWord}`}>
                             <a
-                                onClick={addPlayerTwo}
                                 className={styles.button}>Join as Player 2</a>
                         </Link>
                     </div>

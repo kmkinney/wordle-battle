@@ -20,12 +20,19 @@ export default function Game() {
     const router = useRouter()
 
     const [gameState, setGameState] = useState(startState)
+    const [currPlayer, setCurrPlayer] = useState(null)
+    const [otherPlayer, setOtherPlayer] = useState(null)
 
     useEffect(() => {
-        initSocket()
-        initPlayer()
+        initSocket().then(() => {
+            initPlayer()
+        })
         return closeConnection()
     }, [])
+
+    useEffect(() => {
+        console.log(currPlayer)
+    }, [currPlayer])
 
     const initSocket = async () => {
         await fetch('/api/socket')
@@ -42,38 +49,45 @@ export default function Game() {
             setGameState(newState)
         })
 
+        socket.on('player-update', player => {
+            // console.log("")
+            if(player.number !== currPlayer.number)
+                setOtherPlayer(player)
+        })
+
         socket.on('game-end', newState => {
             console.log("Game has ended")
         })
 
         socket.on('player-join', newPlayer => {
-            console.log(newPlayer)
+            console.log("NEW PLAYER: " + JSON.stringify(newPlayer))
+            console.log("CURR PLAYER: " + JSON.stringify(currPlayer))
+            if(currPlayer !== null && newPlayer.number !== currPlayer.number){
+                setOtherPlayer(newPlayer)
+                fetch('/api/join', {
+                    method: 'POST',
+                    body: JSON.stringify(currPlayer)
+                })
+            }
         })
         // initPlayer()
     }
 
     const initPlayer = () => {
+        console.log("QUERY " + JSON.stringify(router.query))
+
         const playerNum = router.query.p
         const playerName = router.query.n
         const secretWord = router.query.w
-
-        fetch('/api/join', {
-            method: 'POST',
-            body: JSON.stringify({
-                number: playerNum,
-                name: playerName,
-                secretWord: secretWord
-            })
-        })
         console.log("init player")
         // router.replace('/game', undefined, {shallow:true})
-        let players = [{}, {}]
         let letters = {}
         for (let i = 0; i < 26; i++) {
             let c = String.fromCharCode(97 + i)
             letters[c] = 'none'
         }
         let currPlayer = {
+            number: playerNum,
             name: playerName,
             secretWord: secretWord,
             targetWord: '',
@@ -83,13 +97,16 @@ export default function Game() {
             currentGuess: '',
             winner: false
         }
-        players[playerNum - 1] = currPlayer
-        console.log(players)
-        updateGameState({ players: players })
+        setCurrPlayer(currPlayer)
+        fetch('/api/join', {
+            method: 'POST',
+            body: JSON.stringify(currPlayer)
+        })
     }
 
     const closeConnection = () => {
         // console.log(socket)
+        socket?.close()
     }
 
     const updateGameState = (newState) => {
@@ -102,13 +119,11 @@ export default function Game() {
         })
     }
 
-    const getCurrPlayer = () => {
-        return gameState.players[playerNum - 1]
-    }
-
     return (
         <div>
             <p>{JSON.stringify(gameState)}</p>
+            <p>{JSON.stringify(currPlayer)}</p>
+            <p>{JSON.stringify(otherPlayer)}</p>
             <button
                 onClick={() => updateGameState({ started: true })}
             >

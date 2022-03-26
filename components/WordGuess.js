@@ -5,11 +5,10 @@ import { useEffect, useState, useRef } from 'react';
 export default function WordGuess(props) {
   const [word, updateWord] = useState('');
   const [colors, updateColors] = useState([]);
-  const [submitted, wasSubmitted] = useState(false);
 
   useEffect(() => {
     updateColors(getColors(props.targetWord, word));
-  }, [submitted]);
+  }, [props.submitted]);
 
   function Letters(props) {
     return (
@@ -36,13 +35,18 @@ export default function WordGuess(props) {
       <Form
         word={word}
         updateWord={updateWord}
-        wasSubmitted={wasSubmitted}
+        wasSubmitted={props.wasSubmitted}
         targetWord={props.targetWord}
         focus={props.focus}
         updateFocus={props.updateFocus}
         index={props.index}
       />
-      <Letters submitted={submitted} targetWord={props.targetWord} focus={props.focus} index={props.index}/>
+      <Letters
+        submitted={props.submitted}
+        targetWord={props.targetWord}
+        focus={props.focus}
+        index={props.index}
+      />
     </div>
   );
 }
@@ -57,13 +61,18 @@ function Form(props) {
   }, [props.focus]);
 
   const changeWord = (event) => {
-    props.updateWord(event.target.value);
+    if (props.index == props.focus) {
+      props.updateWord(event.target.value);
+    }
     event.preventDefault(); // don't redirect the page
   };
 
   const submitWord = (event) => {
     event.preventDefault(); // don't redirect the page
-    if (event.target[0].value.length == props.targetWord.length && props.index == props.focus) {
+    if (
+      event.target[0].value.length == props.targetWord.length &&
+      props.index == props.focus
+    ) {
       props.wasSubmitted(true);
       props.updateFocus(props.focus + 1);
     }

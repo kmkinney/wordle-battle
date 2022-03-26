@@ -1,12 +1,18 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import WordGuess from '../components/WordGuess';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 
 export default function Home() {
   const [targetWord, updateTargetWord] = useState('tears');
   const [focus, updateFocus] = useState(1);
+  const [submitted1, wasSubmitted1] = useState(false);
+  const [submitted2, wasSubmitted2] = useState(false);
+  const [submitted3, wasSubmitted3] = useState(false);
+  const [submitted4, wasSubmitted4] = useState(false);
+  const [submitted5, wasSubmitted5] = useState(false);
+  const [submitted6, wasSubmitted6] = useState(false);
 
   return (
     <div className={styles.container}>
@@ -22,36 +28,48 @@ export default function Home() {
           index={1}
           focus={focus}
           updateFocus={updateFocus}
+          submitted={submitted1}
+          wasSubmitted={wasSubmitted1}
         />
         <WordGuess
           targetWord={targetWord}
           index={2}
           focus={focus}
           updateFocus={updateFocus}
+          submitted={submitted2}
+          wasSubmitted={wasSubmitted2}
         />
         <WordGuess
           targetWord={targetWord}
           index={3}
           focus={focus}
           updateFocus={updateFocus}
+          submitted={submitted3}
+          wasSubmitted={wasSubmitted3}
         />
         <WordGuess
           targetWord={targetWord}
           index={4}
           focus={focus}
           updateFocus={updateFocus}
+          submitted={submitted4}
+          wasSubmitted={wasSubmitted4}
         />
         <WordGuess
           targetWord={targetWord}
           index={5}
           focus={focus}
           updateFocus={updateFocus}
+          submitted={submitted5}
+          wasSubmitted={wasSubmitted5}
         />
         <WordGuess
           targetWord={targetWord}
           index={6}
           focus={focus}
           updateFocus={updateFocus}
+          submitted={submitted6}
+          wasSubmitted={wasSubmitted6}
         />
       </main>
     </div>

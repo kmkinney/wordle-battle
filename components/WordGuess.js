@@ -12,12 +12,25 @@ export default function WordGuess(props) {
     }, [props.submitted]);
 
     useEffect(() => {
-        if(!guessed && colors.length === 5 && colors.every((c) => c === 'green')){
-            console.log('WORD GUESSED by ' + props.player)
-            fetch('/api/end', {
+        if (props.submitted && colors.length === 5) {
+            console.log(colors)
+            if (colors.every((c) => c === 'green')) {
+                console.log('WORD GUESSED by ' + props.player)
+                fetch('/api/end', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        winner: props.player
+                    })
+                })
+            }
+            fetch('/api/update/guess', {
                 method: 'POST',
                 body: JSON.stringify({
-                    winner: props.player
+                    number: props.player,
+                    guess: {
+                        word: word,
+                        colors: colors
+                    }
                 })
             })
         }

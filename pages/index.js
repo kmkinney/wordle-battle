@@ -87,7 +87,7 @@ export default function Home() {
                         <Link href={isP2Valid ? `/players/2?n=${playerTwoName}&w=${playerTwoWord}` : '#'}
                             className={isP2Valid ? '' : styles.disabled}>
                             <a
-                                className={styles.button}>Join as Player 1</a>
+                                className={styles.button}>Join as Player 2</a>
                         </Link>
                     </div>
                 </div>

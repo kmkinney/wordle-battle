@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { io } from 'socket.io-client';
 import styles from '../../styles/Home.module.css';
 import Game from '../../components/Game'
+import OpponentView from '../../components/OpponentView';
 let socket;
 
 const startState = {
@@ -21,6 +22,7 @@ export default function PlayerOne() {
     const [otherPlayer, setOtherPlayer] = useState(null);
     const [sendUpdate, setSendUpdate] = useState(1)
 
+    const [otherGuesses, updateOtherGuesses] = useState([])
     const [secretWord, updateSecretWord] = useState('-----');
     const [opponentWord, updateOpponentWord] = useState('-----');
 
@@ -33,8 +35,8 @@ export default function PlayerOne() {
     }, []);
 
     useEffect(() => {
-        console.log("opponent word UPDATE" + opponentWord);
-    }, [opponentWord]);
+        console.log("opponent word UPDATE" + JSON.stringify(otherGuesses));
+    }, [otherGuesses]);
 
     useEffect(() => {
         console.log(currPlayer)
@@ -75,6 +77,11 @@ export default function PlayerOne() {
             console.log("PLAYER UPDATE " + other)
             setOtherPlayer(other);
             updateOpponentWord(other.secretWord)
+        });
+
+        socket.on(`player-${3-player}-guess`, (guess) => {
+            console.log("PLAYER GUESS UPDATE " + JSON.stringify(guess))
+            updateOtherGuesses((otherGuesses) => [...otherGuesses,guess])
         });
 
         socket.on('game-ended', (gameWinner) => {
@@ -131,10 +138,6 @@ export default function PlayerOne() {
             name: playerName,
             secretWord: word,
             letters: letters,
-            numGuesses: 0,
-            pastGuesses: [],
-            currentGuess: '',
-            winner: false,
         };
         setCurrPlayer(currPlayer);
     };
@@ -169,7 +172,10 @@ export default function PlayerOne() {
                 {/* <p>{JSON.stringify(gameState)}</p>
                 <p>{JSON.stringify(currPlayer)}</p>
                 <p>{JSON.stringify(otherPlayer)}</p> */}
-
+                <OpponentView word={secretWord} 
+                    name={otherPlayer ? otherPlayer.name : "Player 2"}
+                    guesses={otherGuesses}
+                ></OpponentView>
                 <Game secretWord={opponentWord}
                     startGameFn={startGame}
                     started={gameState.started}

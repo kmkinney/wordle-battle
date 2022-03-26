@@ -4,17 +4,15 @@ export default function Letter(props) {
 
   const [color, updateColor] = useState(`${styles.darkGrey}`);
   
-  // const getColor = () => {
-  //   if (props.letter == targetLetter) return `${styles.green}`;
-  //   if (props.letter !== "" && props.targetWord.includes(props.letter)) {
-  //     return `${styles.yellow}`;
-  //   } 
-  //   return `${styles.darkGrey}`
-  // }
+  const getColor = color => {
+    if (color == "green") return `${styles.green}`;
+    if (color == "yellow") return `${styles.yellow}`;
+    return `${styles.darkGrey}`
+  }
 
-  // useEffect(() => {
-  //   updateColor(getColor(props.targetLetter, props.typedWord))
-  // }, [props.letter])
+  useEffect(() => {
+    updateColor(getColor(props.color))
+  }, [props.letter])
 
   return (
     <div className={styles.flipCard}>

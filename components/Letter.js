@@ -15,7 +15,7 @@ export default function Letter(props) {
       updateColor(getColor(props.color));
       setFlipped(true);
     }
-  }, [props.submitted]);
+  }, []);
 
   return (
     <div

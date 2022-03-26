@@ -1,4 +1,4 @@
-import { Router } from "next/router"
+import { Router, useRouter } from "next/router"
 import { useEffect } from "react"
 import { useState } from "react"
 import { io } from 'socket.io-client'
@@ -14,26 +14,16 @@ const startState = {
     players: []
 }
 
-const defaultPlayer = {
-    name: '',
-    secretWord: '',
-    targetWord: '',
-    letters: {},
-    numGuesses: 0,
-    pastGuesses: [],
-    currentGuess: '',
-    winner: false
-}
-
 const targetWord = "tests"
 
 export default function Game() {
+    const router = useRouter()
+
     const [gameState, setGameState] = useState(startState)
-    const [playerName, setPlayerName] = useState('')
-    const [secretWord, setSecretWord] = useState('')
 
     useEffect(() => {
         initSocket()
+        initPlayer()
         return closeConnection()
     }, [])
 
@@ -55,6 +45,47 @@ export default function Game() {
         socket.on('game-end', newState => {
             console.log("Game has ended")
         })
+
+        socket.on('player-join', newPlayer => {
+            console.log(newPlayer)
+        })
+        // initPlayer()
+    }
+
+    const initPlayer = () => {
+        const playerNum = router.query.p
+        const playerName = router.query.n
+        const secretWord = router.query.w
+
+        fetch('/api/join', {
+            method: 'POST',
+            body: JSON.stringify({
+                number: playerNum,
+                name: playerName,
+                secretWord: secretWord
+            })
+        })
+        console.log("init player")
+        // router.replace('/game', undefined, {shallow:true})
+        let players = [{}, {}]
+        let letters = {}
+        for (let i = 0; i < 26; i++) {
+            let c = String.fromCharCode(97 + i)
+            letters[c] = 'none'
+        }
+        let currPlayer = {
+            name: playerName,
+            secretWord: secretWord,
+            targetWord: '',
+            letters: letters,
+            numGuesses: 0,
+            pastGuesses: [],
+            currentGuess: '',
+            winner: false
+        }
+        players[playerNum - 1] = currPlayer
+        console.log(players)
+        updateGameState({ players: players })
     }
 
     const closeConnection = () => {
@@ -71,65 +102,27 @@ export default function Game() {
         })
     }
 
-    const addPlayer = () => {
-        let currPlayers = gameState.players
-        console.log("NUM PLAYERS " + currPlayers.length)
-        console.log(currPlayers)
-        let letters = {}
-        for (let i = 0; i < 26; i++) {
-            let c = String.fromCharCode(97 + i)
-            letters[c] = 'none'
-        }
-        console.log(letters)
-        currPlayers.push({
-            name: playerName,
-            secretWord: secretWord,
-            targetWord: '',
-            letters: letters,
-            numGuesses: 0,
-            pastGuesses: [],
-            currentGuess: '',
-            winner: false
-        })
-        updateGameState({ players: currPlayers })
+    const getCurrPlayer = () => {
+        return gameState.players[playerNum - 1]
     }
 
     return (
         <div>
             <p>{JSON.stringify(gameState)}</p>
-            <p>Started: {'' + gameState.started}</p>
-            <p>Live: {'' + gameState.live}</p>
-            <p>Done: {'' + gameState.done}</p>
-            <p>PlayerCount: {gameState.players.length}</p>
             <button
                 onClick={() => updateGameState({ started: true })}
             >
                 Start
             </button>
-            <button onClick={(e) => {
-                e.preventDefault()
-                console.log(socket)
-                updateGameState(startState)
-            }}>Reset</button>
 
             <h2>Player Info</h2>
-            <input
-                placeholder="Enter your name"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-            />
-            <input
-                placeholder="Enter your Secret Word"
-                value={secretWord}
-                onChange={(e) => setSecretWord(e.target.value)}
-            />
-            <button onClick={() => { addPlayer() }}>
-                Add Player
-            </button>
+            {/* <h3>Player Num: {playerNum} </h3> */}
+            {/* <h3>{gameState.players} </h3> */}
+            {/* <h3>Player Name: {gameState.players[playerNum-1]}</h3> */}
 
-            <main className={styles.main}>
+            {/* <main className={styles.main}>
                 <WordGuess targetWord={targetWord} />
-            </main>
+            </main> */}
 
         </div>
     )

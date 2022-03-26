@@ -25,6 +25,19 @@
     color: white;
 }
 
+.player {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: stretch;
+}
+
+.textInput {
+    display: block;
+    padding: 5px 15px;
+    margin: 20px 0;
+}
+
 .button {
     display: block;
     color: white;

@@ -13,7 +13,7 @@ export default function WordGuess(props) {
 
     useEffect(() => {
         if (props.submitted && colors.length === 5) {
-            console.log(colors)
+            // console.log(colors)
             if (colors.every((c) => c === 'green')) {
                 console.log('WORD GUESSED by ' + props.player)
                 fetch('/api/end', {
@@ -132,7 +132,7 @@ function Form(props) {
  * @returns
  */
 function getColors(target, guess) {
-    console.log("checking " + target + " " + guess)
+    // console.log("checking " + target + " " + guess)
     let colors = ['grey', 'grey', 'grey', 'grey', 'grey'];
     let tlc = new Map();
     for (let i = 0; i < target.length; i++) {

@@ -1,3 +1,7 @@
+.letter {
+  transition: transform 0.6s;
+}
+
 .flipCard {
   background-color: transparent;
   width: 100px;

@@ -18,7 +18,7 @@ export default function Letter(props) {
     if (props.submitted) {
       setFlipped(true);
     }
-  }, [props.submitted])
+  }, [props.submitted]);
 
   return (
     <div
@@ -33,7 +33,9 @@ export default function Letter(props) {
           <p>{props.letter}</p>
         </div>
         <div className={`${styles.flipCardBack} ${color}`}>
-          <p style={{transform: 'rotateY(180deg)'}}>{props.letter}</p>
+          <p className={styles.letter} style={{ transform: 'rotateY(180deg)' }}>
+            {props.letter}
+          </p>
         </div>
       </div>
     </div>

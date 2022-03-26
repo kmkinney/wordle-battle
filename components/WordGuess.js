@@ -9,7 +9,7 @@ export default function WordGuess(props) {
 
   useEffect(() => {
     updateColors(getColors(props.targetWord, word));
-  }, [word, submitted]);
+  }, [submitted]);
 
   function Letters(props) {
     return (
@@ -20,9 +20,10 @@ export default function WordGuess(props) {
               key={index}
               letter={word[index] == null ? '' : word[index]}
               color={colors[index]}
-              flipLetter={props.submitted}
-              submitted={submitted}
+              submitted={props.submitted}
               targetWord={props.targetWord}
+              focus={props.focus}
+              index={props.index}
             />
           );
         })}
@@ -37,8 +38,11 @@ export default function WordGuess(props) {
         updateWord={updateWord}
         wasSubmitted={wasSubmitted}
         targetWord={props.targetWord}
+        focus={props.focus}
+        updateFocus={props.updateFocus}
+        index={props.index}
       />
-      <Letters submitted={submitted} targetWord={props.targetWord} />
+      <Letters submitted={submitted} targetWord={props.targetWord} focus={props.focus} index={props.index}/>
     </div>
   );
 }
@@ -47,8 +51,10 @@ function Form(props) {
   const inputRef = useRef();
 
   useEffect(() => {
-    inputRef.current.focus();
-  }, []);
+    if (props.index == props.focus) {
+      inputRef.current.focus();
+    }
+  }, [props.focus]);
 
   const changeWord = (event) => {
     props.updateWord(event.target.value);
@@ -57,10 +63,13 @@ function Form(props) {
 
   const submitWord = (event) => {
     event.preventDefault(); // don't redirect the page
-    if (event.target[0].value.length == props.targetWord.length) {
+    if (event.target[0].value.length == props.targetWord.length && props.index == props.focus) {
       props.wasSubmitted(true);
+      props.updateFocus(props.focus + 1);
     }
   };
+
+  let isFocused = props.index == 1;
 
   return (
     <form className={styles.input} onSubmit={submitWord}>
@@ -70,8 +79,8 @@ function Form(props) {
         required
         spellCheck='false'
         onKeyUp={changeWord}
-        onBlur={({ target }) => target.focus()}
-        autoFocus={true}
+        // onBlur={({ target }) => target.focus()}
+        autoFocus={isFocused}
         ref={inputRef}
         maxLength={5}
       />

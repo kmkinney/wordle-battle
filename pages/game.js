@@ -12,6 +12,17 @@ const startState = {
     players: []
 }
 
+const defaultPlayer = {
+    name: '',
+    secretWord: '',
+    targetWord: '',
+    letters: {},
+    numGuesses: 0,
+    pastGuesses: [],
+    currentGuess: '',
+    winner: false
+}
+
 export default function Game() {
     const [gameState, setGameState] = useState(startState)
     const [playerName, setPlayerName] = useState('')
@@ -33,6 +44,7 @@ export default function Game() {
             console.log("Game State Updated")
             console.log(newState)
             // processUpdate(newState)
+            // if(gameState != newState)
             setGameState(newState)
         })
 
@@ -42,16 +54,16 @@ export default function Game() {
     }
 
     const closeConnection = () => {
-        console.log(socket)
-    } 
+        // console.log(socket)
+    }
 
     const updateGameState = (newState) => {
-        socket.emit('game-update', newState)
-        setGameState(gameState => {
-            return {
+        fetch('/api/update', {
+            method: 'POST',
+            body: JSON.stringify({
                 ...gameState,
                 ...newState
-            }
+            })
         })
     }
 
@@ -59,52 +71,58 @@ export default function Game() {
         let currPlayers = gameState.players
         console.log("NUM PLAYERS " + currPlayers.length)
         console.log(currPlayers)
+        let letters = {}
+        for (let i = 0; i < 26; i++) {
+            let c = String.fromCharCode(97 + i)
+            letters[c] = 'none'
+        }
+        console.log(letters)
         currPlayers.push({
             name: playerName,
             secretWord: secretWord,
             targetWord: '',
-            letters: Array.from('none'.repeat(26)),
+            letters: letters,
             numGuesses: 0,
             pastGuesses: [],
-            currentGuess: '', 
+            currentGuess: '',
             winner: false
         })
-        updateGameState({players: currPlayers})
+        updateGameState({ players: currPlayers })
     }
 
     return (
         <div>
             <p>{JSON.stringify(gameState)}</p>
-            <p>Started: {''+gameState.started}</p>
-            <p>Live: {''+gameState.live}</p>
-            <p>Done: {''+gameState.done}</p>
+            <p>Started: {'' + gameState.started}</p>
+            <p>Live: {'' + gameState.live}</p>
+            <p>Done: {'' + gameState.done}</p>
             <p>PlayerCount: {gameState.players.length}</p>
             <button
-                onClick={() => updateGameState({started: true})}
+                onClick={() => updateGameState({ started: true })}
             >
                 Start
             </button>
             <button onClick={(e) => {
                 e.preventDefault()
                 console.log(socket)
-                // socket.disconnect()
-                socket.emit("game-update", gameState)
-            }}>Update</button>
+                updateGameState(startState)
+            }}>Reset</button>
 
             <h2>Player Info</h2>
             <input
                 placeholder="Enter your name"
                 value={playerName}
-                onChange={(e)=>setPlayerName(e.target.value)}
+                onChange={(e) => setPlayerName(e.target.value)}
             />
             <input
                 placeholder="Enter your Secret Word"
                 value={secretWord}
-                onChange={(e)=>setSecretWord(e.target.value)}
+                onChange={(e) => setSecretWord(e.target.value)}
             />
-            <button onClick={() => {addPlayer()}}>
+            <button onClick={() => { addPlayer() }}>
                 Add Player
             </button>
+
         </div>
     )
 }

@@ -12,7 +12,12 @@ var state = {
                 'green'|'yellow'|'grey'|'none'
             ],
             numGuesses: number,
-            pastGuesses: [],
+            pastGuesses: [
+                {
+                    word: string,
+                    colors: []
+                }
+            ],
             currentGuess: '', 
             winner: bool
         }

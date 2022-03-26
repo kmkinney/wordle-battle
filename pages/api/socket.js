@@ -15,7 +15,7 @@ const SocketHandler = function (req, res) {
             // Initialize Event Listeners
             socket.on('game-update', newState => {
                 console.log('Game state was updated')
-                console.log(socket)
+                // console.log(socket)
                 socket.broadcast.emit('update-game-state', newState)
             })
 

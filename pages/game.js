@@ -2,6 +2,8 @@ import { Router } from "next/router"
 import { useEffect } from "react"
 import { useState } from "react"
 import { io } from 'socket.io-client'
+import styles from '../styles/Home.module.css'
+import WordGuess from '../components/WordGuess'
 let socket
 
 const startState = {
@@ -22,6 +24,8 @@ const defaultPlayer = {
     currentGuess: '',
     winner: false
 }
+
+const targetWord = "tests"
 
 export default function Game() {
     const [gameState, setGameState] = useState(startState)
@@ -122,6 +126,10 @@ export default function Game() {
             <button onClick={() => { addPlayer() }}>
                 Add Player
             </button>
+
+            <main className={styles.main}>
+                <WordGuess targetWord={targetWord} />
+            </main>
 
         </div>
     )

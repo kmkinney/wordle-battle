@@ -204,6 +204,10 @@ export default function PlayerOne() {
                     <a
                         className={styles.button}>Play Again</a>
                 </Link>
+                <div className={styles.results}>
+                    <h2>Your word: {secretWord}</h2>
+                    <h2>{otherPlayer.name}'s word: {opponentWord}</h2>
+                </div>
             </div>
         )
     }

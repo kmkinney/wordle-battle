@@ -55,6 +55,7 @@
 }
 
 .start {
+    margin-top: 30px;
     text-align: center;
 }
 
@@ -68,6 +69,8 @@
 }
 
 .gameOver {
+    display: flex;
+    flex-direction: column;
     text-align: center;
 }
 
@@ -84,4 +87,10 @@
     left: 0;
     padding: 20px;
     text-align: center;
+}
+
+.results{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 }

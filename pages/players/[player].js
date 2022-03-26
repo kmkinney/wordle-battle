@@ -166,9 +166,9 @@ export default function PlayerOne() {
     if (!gameState.done) {
         return (
             <div>
-                <p>{JSON.stringify(gameState)}</p>
+                {/* <p>{JSON.stringify(gameState)}</p>
                 <p>{JSON.stringify(currPlayer)}</p>
-                <p>{JSON.stringify(otherPlayer)}</p>
+                <p>{JSON.stringify(otherPlayer)}</p> */}
 
                 <Game secretWord={opponentWord}
                     startGameFn={startGame}

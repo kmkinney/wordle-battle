@@ -50,6 +50,10 @@
     background-color: var(--green);
 }
 
+.disabled a:hover {
+    background-color: var(--lightGrey) !important;
+}
+
 .start {
     text-align: center;
 }
@@ -65,4 +69,11 @@
 
 .gameOver {
     text-align: center;
+}
+
+.hint {
+    font-style: italic;
+    color: var(--lightGrey);
+    width: 10rem;
+    height: 2rem;
 }

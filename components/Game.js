@@ -28,7 +28,7 @@ export default function Game(props) {
                     <link rel='icon' href='/favicon.ico' />
                 </Head>
                 <main className={styles.main}>
-                    <h1 className={styles.title}>SECRET: {props.secretWord}</h1>
+                    {/* <h1 className={styles.title}>SECRET: {props.secretWord}</h1> */}
                     <WordGuess
                         player={props.player}
                         targetWord={props.secretWord}

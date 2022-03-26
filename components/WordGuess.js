@@ -1,6 +1,6 @@
 import Letter from './Letter';
 import styles from '../styles/WordGuess.module.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 export default function WordGuess(props) {
   const [word, updateWord] = useState('');
@@ -21,7 +21,11 @@ export default function WordGuess(props) {
 
 function Form(props) {
 
-  const [focus, setFocus] = useState(true);
+  const inputRef = useRef();
+
+  useEffect(() => {
+    inputRef.current.focus();
+  }, [])
 
   const changeWord = (event) => {
     event.preventDefault(); // don't redirect the page
@@ -38,7 +42,9 @@ function Form(props) {
         spellCheck='false'
         onKeyUp={changeWord}
         onBlur={({ target }) => target.focus()}
-        autoFocus
+        autoFocus={true}
+        ref={inputRef}
+        maxLength={5}
       />
     </form>
   );
